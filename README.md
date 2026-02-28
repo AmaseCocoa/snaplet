@@ -25,8 +25,8 @@ uv add snaplet
 ```python
 from typing import Annotated
 
-from snaplet.base import SnapletBase
-from snaplet.field import Field
+from snaplet import SnapletBase
+from snaplet import Field
 
 
 class User(SnapletBase):
