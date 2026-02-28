@@ -68,3 +68,6 @@ Measured on Python 3.12.
 - **JIT Property Access**: Specialized property accessors are compiled at runtime using `exec()`, eliminating branch overhead.
 - **Lazy Instantiation**: Nested objects are only instantiated when accessed.
 - **Minimal Overhead**: Bypassing `__init__` during bulk loading to achieve near-native speeds.
+
+## LICENSE
+MIT License

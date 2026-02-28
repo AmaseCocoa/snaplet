@@ -1,5 +1,3 @@
-from typing import List
-
 import orjson
 import pytest
 
@@ -13,7 +11,7 @@ class SubItem(SnapletBase):
 
 class RootModel(SnapletBase):
     id: int
-    items: List[SubItem]
+    items: list[SubItem]
     meta: str
 
 

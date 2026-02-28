@@ -1,5 +1,3 @@
-from typing import Any, cast
-
 import pytest
 
 from snaplet import SnapletBase
@@ -19,6 +17,7 @@ class FastUser(SnapletBase):
         self.init_called = True
         super().__init__(*args, **kwargs)
 
+
 class Child(SnapletBase, jit=True):
     name: str
 
@@ -26,9 +25,11 @@ class Child(SnapletBase, jit=True):
 class Parent(SnapletBase, jit=True):
     child: Child
 
+
 class NestedModel(SnapletBase):
     id: int
     tags: list[str]
+
 
 def test_basic_functionality():
     data = {"userId": 1, "userName": "gemini", "isActive": True}
@@ -38,6 +39,7 @@ def test_basic_functionality():
     assert user.user_name == "gemini"
     assert user.is_active is True
     assert user._data is data
+
 
 @pytest.mark.parametrize(
     "input_val, expected",
@@ -54,8 +56,6 @@ def test_type_casting(input_val, expected):
 
     m = CastModel({"val": input_val})
     assert m.val == expected
-
-
 
 
 def test_nested_model():

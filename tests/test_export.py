@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import orjson
 
 from snaplet import SnapletBase
@@ -13,9 +11,9 @@ class Item(SnapletBase):
 class User(SnapletBase):
     id: int
     name: str
-    tags: List[str]
-    items: List[Item]
-    extra: Optional[str] = None
+    tags: list[str]
+    items: list[Item]
+    extra: str | None = None
 
 
 raw_json = b"""

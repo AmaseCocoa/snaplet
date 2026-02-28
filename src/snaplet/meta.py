@@ -3,9 +3,6 @@ import textwrap
 from typing import (
     Annotated,
     Any,
-    Dict,
-    List,
-    Type,
     Union,
     cast,
     get_args,
@@ -13,7 +10,7 @@ from typing import (
     get_type_hints,
 )
 
-_CAMEL_CACHE: Dict[str, str] = {}
+_CAMEL_CACHE: dict[str, str] = {}
 
 
 def to_camel_case(snake_str: str) -> str:
@@ -50,7 +47,7 @@ class SnapletMeta(type):
         attrs["__snaplet_jit__"] = jit
 
         cls = super().__new__(mcs, name, bases, attrs)
-        setattr(cls, "_snaplet_fields", {})
+        cls._snaplet_fields = {} # ty: ignore[unresolved-attribute]
         if name == "SnapletBase":
             return cls
 
@@ -74,7 +71,7 @@ class SnapletMeta(type):
                 )
 
             setattr(cls, field_name, prop)
-        setattr(cls, "_snaplet_fields", fields_map)
+        cls._snaplet_fields = fields_map # ty: ignore[unresolved-attribute]
 
         return cls
 
@@ -83,11 +80,11 @@ class SnapletMeta(type):
 
     @staticmethod
     def _create_dynamic_accessor(
-        name: str, json_key: str, field_type: Type, base_type: Type
+        name: str, json_key: str, field_type: type, base_type: type
     ):
         def get_kind(tp):
             origin = get_origin(tp)
-            if origin in (list, List):
+            if origin in (list, list):
                 args = get_args(tp)
                 if args:
                     sub_tp = args[0]
@@ -109,7 +106,7 @@ class SnapletMeta(type):
             if kind == "snaplet":
                 val = field_type(raw)
             elif kind == "list_snaplet":
-                st = cast(Type[Any], sub_tp) 
+                st = cast(type[Any], sub_tp)
                 val = [st(i) for i in raw] if isinstance(raw, list) else raw
             else:
                 if isinstance(raw, base_type):
@@ -130,11 +127,11 @@ class SnapletMeta(type):
 
     @staticmethod
     def _compile_accessor(
-        name: str, json_key: str, field_type: Type, base_type: Type
+        name: str, json_key: str, field_type: type, base_type: type
     ):
         def is_snaplet_type(tp):
             origin = get_origin(tp)
-            if origin is list or origin is List:
+            if origin is list or origin is list:
                 args = get_args(tp)
                 if args and hasattr(args[0], "_snaplet_fields"):
                     return "list_snaplet", args[0]
@@ -174,7 +171,11 @@ class SnapletMeta(type):
                 self._cache['{name}'] = value
         """)
 
-        namespace = {"__T": field_type, "__B": base_type, "__SUB_T": sub_tp if sub_tp is not None else object}
+        namespace = {
+            "__T": field_type,
+            "__B": base_type,
+            "__SUB_T": sub_tp if sub_tp is not None else object,
+        }
         exec(template.strip(), namespace)
 
         return property(fget=namespace["_getter"], fset=namespace["_setter"])

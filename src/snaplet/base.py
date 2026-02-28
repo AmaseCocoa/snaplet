@@ -1,9 +1,6 @@
 from typing import (
     Any,
-    List,
-    Type,
     TypeVar,
-    Union,
 )
 
 import orjson
@@ -25,21 +22,18 @@ class SnapletBase(metaclass=SnapletMeta):
         return f"{self.__class__.__name__}({self.to_dict()})"
 
     @classmethod
-    def bulk_load(cls: Type[T], data: Union[bytes, list]) -> List[T]:
-        if isinstance(data, bytes):
-            items = orjson.loads(data)
-        else:
-            items = data
-    
+    def bulk_load(cls: type[T], data: bytes | list) -> list[T]:
+        items = orjson.loads(data) if isinstance(data, bytes) else data
+
         new_obj = cls.__new__
         results = []
-        
+
         for item in items:
             obj = new_obj(cls)
             object.__setattr__(obj, "_data", item)
             object.__setattr__(obj, "_cache", {})
             results.append(obj)
-            
+
         return results
 
     @classmethod

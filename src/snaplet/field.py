@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class Field:
-    def __init__(self, alias: Optional[str] = None):
+    def __init__(self, alias: str | None = None):
         self.alias = alias
