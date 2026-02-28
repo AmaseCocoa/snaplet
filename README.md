@@ -1,0 +1,2 @@
+# Snaplet
+Faster JSON Mapping.
