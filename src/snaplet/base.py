@@ -13,10 +13,45 @@ T = TypeVar("T", bound="SnapletBase")
 class SnapletBase(metaclass=SnapletMeta):
     __slots__ = ("_data", "_cache")
     _snaplet_fields: dict[str, str] = {}
+    _snaplet_metadata: dict[str, tuple] = {}
 
     def __init__(self, data: dict):
         self._data = data
         self._cache = {}
+
+    def get(self, name: str) -> Any | None:
+        if name in self._cache:
+            return self._cache[name]
+
+        meta = self._snaplet_metadata.get(name)
+        if not meta:
+            return self._data.get(name)
+
+        json_key, field_type, base_type, kind, sub_tp = meta
+        raw = self._data.get(json_key)
+        if raw is None:
+            return None
+
+        if kind == "snaplet":
+            val = field_type(raw)
+        elif kind == "list_snaplet":
+            val = [sub_tp(i) for i in raw] if isinstance(raw, list) else raw
+        else:
+            if isinstance(raw, base_type):
+                val = raw
+            else:
+                try:
+                    val = field_type(raw)
+                except (TypeError, ValueError):
+                    val = raw
+        self._cache[name] = val
+        return val
+
+    def set(self, name: str, value: Any) -> None:
+        meta = self._snaplet_metadata.get(name)
+        json_key = meta[0] if meta else name
+        self._data[json_key] = getattr(value, "_data", value)
+        self._cache[name] = value
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.to_dict()})"

@@ -47,7 +47,7 @@ class SnapletMeta(type):
         attrs["__snaplet_jit__"] = jit
 
         cls = super().__new__(mcs, name, bases, attrs)
-        cls._snaplet_fields = {} # ty: ignore[unresolved-attribute]
+        cls._snaplet_fields = {}  # ty: ignore[unresolved-attribute]
         if name == "SnapletBase":
             return cls
 
@@ -71,7 +71,7 @@ class SnapletMeta(type):
                 )
 
             setattr(cls, field_name, prop)
-        cls._snaplet_fields = fields_map # ty: ignore[unresolved-attribute]
+        cls._snaplet_fields = fields_map  # ty: ignore[unresolved-attribute]
 
         return cls
 
@@ -126,9 +126,7 @@ class SnapletMeta(type):
         return property(fget, fset)
 
     @staticmethod
-    def _compile_accessor(
-        name: str, json_key: str, field_type: type, base_type: type
-    ):
+    def _compile_accessor(name: str, json_key: str, field_type: type, base_type: type):
         def is_snaplet_type(tp):
             origin = get_origin(tp)
             if origin is list or origin is list:
@@ -144,7 +142,9 @@ class SnapletMeta(type):
         if kind == "snaplet":
             cast_logic = "val = __T(raw)"
         elif kind == "list_snaplet":
-            cast_logic = "val = [__SUB_T(i) for i in raw] if isinstance(raw, list) else raw"
+            cast_logic = (
+                "val = [__SUB_T(i) for i in raw] if isinstance(raw, list) else raw"  # noqa: E501
+            )
         else:
             cast_logic = textwrap.dedent("""
                 if isinstance(raw, __B):
